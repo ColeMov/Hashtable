@@ -66,11 +66,11 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
   public void testDuplicateInsertions() {
     HashtableMap<String, Integer> map = new HashtableMap<>();
     map.put("a", 6);
-    assertThrows(
+    Assertions.assertThrows(
            IllegalArgumentException.class,
            () -> map.put("a", 7)
     );
-    assertThrows(
+    Assertions.assertThrows(
            IllegalArgumentException.class,
            () -> map.put("a", 8)
     );
@@ -84,17 +84,17 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
   @Test
   public void testMultipleDuplicateInsertions() {
     HashtableMap<String, Integer> map = new HashtableMap<>();
-    assertTrue( map.put("a", 6) );
-    assertThrows(
+    map.put("a", 6);
+    Assertions.assertThrows(
            IllegalArgumentException.class,
            () -> map.put("a", 7)
     );
-    assertTrue( map.put("b", 5) );
-    assertThrows(
+    map.put("b", 5);
+    Assertions.assertThrows(
            IllegalArgumentException.class,
            () -> map.put("a", 8)
     );
-    assertThrows(
+    Assertions.assertThrows(
            IllegalArgumentException.class,
            () -> map.put("b", 5)
     );
@@ -122,7 +122,7 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
     map.put(6, "one");
     map.put(8, "two");
     map.put(9, "three");
-    assertThrows(
+    Assertions.assertThrows(
            NoSuchElementException.class,
            () -> map.get(7)
     );
@@ -151,7 +151,7 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
     map.put(17, "one");
     map.put(28, "two");
     map.put(77, "three");
-    assertThrows(
+    Assertions.assertThrows(
            NoSuchElementException.class,
            () -> map.get(27)
     );
@@ -161,7 +161,7 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
    * Tests get for a key that has been removed.
    */
   @Test
-  public void testGetAfterRemove() throws GraderException {
+  public void testGetAfterRemove() {
     HashtableMap<Integer, Integer> map = new HashtableMap<>();
     map.put(2, 6);
     map.put(3, 7);
@@ -169,7 +169,7 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
     map.get(3);
     map.remove(3);
 
-    assertThrows(
+    Assertions.assertThrows(
            NoSuchElementException.class,
            () -> map.get(3)
     );
@@ -179,14 +179,14 @@ public class P25SubmissionChecker extends HashtableMap<Integer, Integer> {
    * Tests removal of a key that is not contained in the HashtableMap.
    */
   @Test
-  public void testRemoveThrowsException() throws GraderException {
+  public void testRemoveThrowsException() {
     HashtableMap<Integer, Integer> map = new HashtableMap<>(10);
     map.put(2, 0);
     map.put(22, 0);
     map.put(32, 1);
     map.put(42, 1);
 
-    assertThrows(
+    Assertions.assertThrows(
            NoSuchElementException.class,
            () -> map.remove(12)
     );
