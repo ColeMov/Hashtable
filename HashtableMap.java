@@ -1,3 +1,10 @@
+// --== CS400 Fall 2023 File Header Information ==--
+// Name: Cole Movsessian
+// Email: movsessian@wisc.edu
+// Group: G27
+// TA: Grant Waldow
+// Lecturer: Florian
+// Notes to Grader: <optional extra notes>
 
 import org.junit.Test;
 import java.util.LinkedList;
@@ -19,13 +26,13 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
     protected LinkedList<Pair>[] table;
     protected int tableCapacity = 30;
 
-    //@SuppressWarnings("unchecked");
+    // @SuppressWarnings("unchecked");
     public HashtableMap(int capacity){
         this.tableCapacity = capacity;
         table = new LinkedList[capacity];
     }
 
-    //@SuppressWarnings("unchecked");
+    // @SuppressWarnings("unchecked");
     public HashtableMap(){
         table = new LinkedList[tableCapacity];
     }
@@ -41,14 +48,33 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         if(key == null || containsKey(key)){
             throw new IllegalArgumentException("Key is null or already stored");
         }
+
         Pair putPair = new Pair((KeyType) key, (ValueType) value);
-        int keyHash = Math.abs((int)key % tableCapacity);
+        int keyHash = Math.abs(((key.hashCode()) % tableCapacity));
 
         if(table[keyHash] == null){
             table[keyHash] = new LinkedList<>();
         }
 
         table[keyHash].add(putPair);
+
+        if(((double)getSize()/(double)getCapacity()) >= 0.75){
+            doubleHashtable();
+        }
+    }
+
+    /**
+     * Doubles the capacity of the hashtable and rehashes stored values
+     */
+    private LinkedList<Pair>[] doubleHashtable(){
+        this.tableCapacity = tableCapacity*2;
+        LinkedList<Pair>[] newTable = new LinkedList[tableCapacity];
+
+        for(LinkedList<Pair> pairChain : table){
+            for(Pair pair : pairChain){
+                newTable.put(pair.key, pair.value);
+            }
+        }
     }
 
     /**
@@ -59,15 +85,14 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
      */
     @Override
     public boolean containsKey(Object key) {
-        // CASTING ISSUES
-        int keyHash = Math.abs((int)key % tableCapacity);
-        LinkedList<Pair> pairChainList = table[keyHash];
+        int keyHash = Math.abs((key.hashCode()) % tableCapacity);
+        LinkedList<Pair> pairChain = table[keyHash];
 
         if(table[keyHash] == null){
             return false;
         }
 
-        for(Pair pair : pairChainList){
+        for(Pair pair : pairChain){
             if(pair.key.equals(key)){
                 return true;
             }
@@ -88,10 +113,10 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
             throw new NoSuchElementException("Key not stored");
         }
 
-        int keyHash = Math.abs((int)key % tableCapacity);
-        LinkedList<Pair> pairChainList = table[keyHash];
+        int keyHash = Math.abs((key.hashCode()) % tableCapacity);
+        LinkedList<Pair> pairChain = table[keyHash];
 
-        for(Pair pair : pairChainList){
+        for(Pair pair : pairChain){
             if(pair.key.equals(key)){
                 return pair.value;
             }
@@ -116,9 +141,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         Pair removePair = null;
         Object removeValue = null;
         int keyHash = Math.abs((int)key % tableCapacity);
-        LinkedList<Pair> pairChainList = table[keyHash];
+        LinkedList<Pair> pairChain = table[keyHash];
 
-        for(Pair pair : pairChainList){
+        for(Pair pair : pairChain){
             if(pair.key.equals(key)){
                 removePair = pair;
                 removeValue = pair.value;
@@ -127,7 +152,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         }
 
         if(removeValue != null){
-            pairChainList.remove(removePair);
+            pairChain.remove(removePair);
         }else{
             throw new NoSuchElementException("Key not stored");
         }
