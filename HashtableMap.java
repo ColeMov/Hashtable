@@ -12,7 +12,15 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Assertions;
 import java.lang.Math.*;
 
+/**
+ * Stored key, value pairs in a map
+ * @param <KeyType> Key type
+ * @param <ValueType> Value type
+ */
 public class HashtableMap<KeyType, ValueType> implements MapADT{
+    /**
+     * Stores key and value in pair object
+     */
     protected class Pair {
         public KeyType key;
         public ValueType value;
@@ -26,13 +34,20 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
     protected LinkedList<Pair>[] table;
     protected int tableCapacity = 30;
 
-    // @SuppressWarnings("unchecked");
+    /**
+     * Default constructor for HashmapTable
+     * @param capacity
+     */
+    @SuppressWarnings("unchecked")
     public HashtableMap(int capacity){
         this.tableCapacity = capacity;
         table = new LinkedList[capacity];
     }
 
-    // @SuppressWarnings("unchecked");
+    /**
+     * Constructor to set table to custom capacity
+     */
+    @SuppressWarnings("unchecked")
     public HashtableMap(){
         table = new LinkedList[tableCapacity];
     }
@@ -45,12 +60,13 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
      */
     @Override
     public void put(Object key, Object value) throws IllegalArgumentException {
+        // Checks for null or already existing key
         if(key == null || containsKey(key)){
             throw new IllegalArgumentException("Key is null or already stored");
         }
 
         Pair putPair = new Pair((KeyType) key, (ValueType) value);
-        int keyHash = Math.abs(((key.hashCode()) % tableCapacity));
+        int keyHash = Math.abs(((key.hashCode()) % tableCapacity)); // calculates hash code to determine table placement
 
         if(table[keyHash] == null){
             table[keyHash] = new LinkedList<>();
@@ -58,6 +74,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
 
         table[keyHash].add(putPair);
 
+        // Checks if table capacity needs to be doubled
         if(((double)getSize()/(double)getCapacity()) >= 0.75){
             doubleHashtable();
         }
@@ -66,15 +83,27 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
     /**
      * Doubles the capacity of the hashtable and rehashes stored values
      */
-    private LinkedList<Pair>[] doubleHashtable(){
+    private void doubleHashtable(){
         this.tableCapacity = tableCapacity*2;
         LinkedList<Pair>[] newTable = new LinkedList[tableCapacity];
 
+        // Visits each pairChain
         for(LinkedList<Pair> pairChain : table){
-            for(Pair pair : pairChain){
-                newTable.put(pair.key, pair.value);
+            if(pairChain != null){
+                // Visits each pair and copies it to new table
+                for(Pair pair : pairChain){
+                    // Calculates new hash with doubled table capacity
+                    int newHash = Math.abs((pair.key.hashCode())) % tableCapacity;
+
+                    if(newTable[newHash] == null){
+                        newTable[newHash] = new LinkedList<>();
+                    }
+                    newTable[newHash].add(pair);
+                }
             }
         }
+
+        table = newTable;
     }
 
     /**
@@ -92,6 +121,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
             return false;
         }
 
+        // Visits each pair in pairChain with the key hash
         for(Pair pair : pairChain){
             if(pair.key.equals(key)){
                 return true;
@@ -109,6 +139,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
      */
     @Override
     public Object get(Object key) throws NoSuchElementException {
+        // Confirms key is stored
         if(!(this.containsKey(key))){
             throw new NoSuchElementException("Key not stored");
         }
@@ -116,6 +147,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         int keyHash = Math.abs((key.hashCode()) % tableCapacity);
         LinkedList<Pair> pairChain = table[keyHash];
 
+        // Visits each pair in pairChain with the key hash
         for(Pair pair : pairChain){
             if(pair.key.equals(key)){
                 return pair.value;
@@ -134,6 +166,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
      */
     @Override
     public Object remove(Object key) throws NoSuchElementException {
+        // Confirms key is stored
         if(!(containsKey(key))){
             throw new NoSuchElementException("Key not stored");
         }
@@ -143,7 +176,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         int keyHash = Math.abs((int)key % tableCapacity);
         LinkedList<Pair> pairChain = table[keyHash];
 
+        // Visits each pair in pairChain
         for(Pair pair : pairChain){
+            // When key is found pair is removed
             if(pair.key.equals(key)){
                 removePair = pair;
                 removeValue = pair.value;
@@ -151,6 +186,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
             }
         }
 
+        // Removes pair
         if(removeValue != null){
             pairChain.remove(removePair);
         }else{
@@ -164,6 +200,7 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
      */
     @Override
     public void clear() {
+        // Iterates through every pair in every pairChain and clears values
         for(LinkedList<Pair> pairChain : table){
             if(pairChain != null) {
                 pairChain.clear();
@@ -179,7 +216,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
     public int getSize() {
         int size = 0;
 
+        // Iterates through each pairChain in table
         for(LinkedList<Pair> pairChain : table){
+            // For each non-null pairChain iterates through pairs and increments size
             if(pairChain != null){
                 for(Pair pair : pairChain){
                     size++;
@@ -199,7 +238,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         return tableCapacity;
     }
 
-    //============================================================================
+    /**
+     *  Tests collisions on pair put
+     */
     @Test
     public void testPutCollision(){
         HashtableMap<Integer, Integer> testMap = new HashtableMap();
@@ -213,6 +254,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         }
     }
 
+    /**
+     * Tests contains key method
+     */
     @Test
     public void testContainsKey(){
         HashtableMap<Integer, Integer> testMap = new HashtableMap(10);
@@ -224,6 +268,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         Assertions.assertTrue(!(testMap.containsKey(3)));
     }
 
+    /**
+     * Tests remove method
+     */
     @Test
     public void testRemove(){
         HashtableMap<Integer, Integer> testMap = new HashtableMap(10);
@@ -242,6 +289,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         Assertions.assertEquals(4, testMap.getSize());
     }
 
+    /**
+     * Tests get method
+     */
     @Test
     public void testGet(){
         HashtableMap<Integer, Integer> testMap = new HashtableMap(10);
@@ -253,6 +303,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         Assertions.assertEquals(100, testMap.get(2));
     }
 
+    /**
+     * Tests get size and capacity methods
+     */
     @Test
     public void testGetSizeAndCapacity(){
         HashtableMap<Integer, Integer> testMap = new HashtableMap(10);
@@ -268,6 +321,9 @@ public class HashtableMap<KeyType, ValueType> implements MapADT{
         Assertions.assertEquals(6, testMap.getSize());
     }
 
+    /**
+     * Tests clear method
+     */
     @Test
     public void testClear(){
         HashtableMap<Integer, Integer> testMap = new HashtableMap(10);
