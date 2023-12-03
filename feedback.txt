@@ -1,0 +1,24 @@
+(2.0/2.0) - hashtable resizes as expected
+(2.0/2.0) - hashtable resizes at threshold 0.75
+(2.0/2.0) - no duplicates are inserted
+(2.0/2.0) - IllegalArgumentException is thrown when inserting duplicates
+(2.0/2.0) - get returns expected value on small map
+(1.0/1.0) - get throws NoSuchElementException if key is not in table
+(2.0/2.0) - get returns expected value for two colliding keys
+(1.0/1.0) - get throws exception for key not in table but that collides with another key in table
+(2.0/2.0) - get throws exception after key was removed
+(2.0/2.0) - remove throws exception if key is not in table
+(2.0/2.0) - get throws exception after clear
+(1.0/1.0) - size returns 0 after clear
+(0.0/1.0) - no-args constructor initializes table with capacity 32
+		getCapacity() on a HashtableMap created with no-args constructor does not return 32, but should
+
+(2.0/2.0) - int-arg constructor initializes table with expected capacity
+(1.0/1.0) - size of empty hashtable is 0
+(2.0/2.0) - get on empty hashtable throws exception
+(1.0/1.0) - getSize() returns the expected number of keys in the hashtable
+(2.0/2.0) - getSize() returns the expected number of keys in the hashtable after a resize
+(5.0/5.0) - code styling and comments
+(5.00/5.00) - tests submitted
+
+TOTAL:  39.0 / 40
